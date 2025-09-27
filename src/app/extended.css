@@ -1,0 +1,29 @@
+table {
+  background-color: rgba(244, 248, 247, 0.5);
+  border-color: #ddd;
+  border-width: 1px;
+}
+
+thead {
+  background-color: rgb(231, 240, 238);
+}
+
+tbody tr:nth-child(odd) {
+  background-color: rgb(244, 248, 247);
+}
+
+th,
+td {
+  padding: 8px;
+  vertical-align: top;
+  text-align: left;
+}
+
+h1 {
+  background-color: rgb(38, 91, 78);
+  display: inline-block;
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}

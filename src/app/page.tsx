@@ -15,6 +15,7 @@ type Advocate = {
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
   const [filteredAdvocates, setFilteredAdvocates] = useState<Advocate[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     console.log("fetching advocates...");
@@ -26,43 +27,72 @@ export default function Home() {
     });
   }, []);
 
-  const onChange = (e) => {
-    const searchTerm = e.target.value;
-
-    document.getElementById("search-term").innerHTML = searchTerm;
-
-    console.log("filtering advocates...");
-    const filteredAdvocates = advocates.filter((advocate) => {
-      return (
-        advocate.firstName.includes(searchTerm) ||
-        advocate.lastName.includes(searchTerm) ||
-        advocate.city.includes(searchTerm) ||
-        advocate.degree.includes(searchTerm) ||
-        advocate.specialties.includes(searchTerm) ||
-        advocate.yearsOfExperience.includes(searchTerm)
-      );
-    });
-
-    setFilteredAdvocates(filteredAdvocates);
+  const handleSearchChange = (e: { target: { value: string } }) => {
+    setSearchTerm(e.target.value);
   };
 
-  const onClick = () => {
-    console.log(advocates);
+  const handleSearchReset = () => {
+    setSearchTerm("");
     setFilteredAdvocates(advocates);
+  };
+
+  const handleSearch = () => {
+    setFilteredAdvocates(
+      advocates.filter((advocate) => {
+        return (
+          advocate.firstName.includes(searchTerm) ||
+          advocate.lastName.includes(searchTerm) ||
+          advocate.city.includes(searchTerm) ||
+          advocate.degree.includes(searchTerm) ||
+          advocate.specialties.includes(searchTerm) ||
+          advocate.yearsOfExperience.toString().includes(searchTerm)
+        );
+      })
+    );
+  };
+
+  const resetSearch = () => {
+    setAdvocates([]);
+  };
+
+  const formatPhone = (phone: number) => {
+    const phoneStr = phone.toString();
+    if (phoneStr.length === 10)
+      return `(${phoneStr.slice(0, 3)}) ${phoneStr.slice(
+        3,
+        6
+      )} - ${phoneStr.slice(6)}`;
+    return "";
   };
 
   return (
     <main style={{ margin: "24px" }}>
       <h1>Solace Advocates</h1>
-      <br />
-      <br />
       <div>
-        <p>Search</p>
         <p>
-          Searching for: <span id="search-term"></span>
+          Searching for: <span>{searchTerm}</span>
         </p>
-        <input style={{ border: "1px solid black" }} onChange={onChange} />
-        <button onClick={onClick}>Reset Search</button>
+        <p>
+          <input
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="px-3 py-2 border rounded-lg mr-3"
+          />
+
+          <button
+            onClick={handleSearchReset}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded mr-3"
+          >
+            Reset
+          </button>
+
+          <button
+            onClick={handleSearch}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+          >
+            Search
+          </button>
+        </p>
       </div>
       <br />
       <br />
@@ -79,20 +109,22 @@ export default function Home() {
           </tr>
         </thead>
         <tbody>
-          {filteredAdvocates.map((advocate: Advocate) => {
+          {filteredAdvocates.map((advocate: Advocate, index: number) => {
             return (
-              <tr>
+              <tr key={index}>
                 <td>{advocate.firstName}</td>
                 <td>{advocate.lastName}</td>
                 <td>{advocate.city}</td>
                 <td>{advocate.degree}</td>
                 <td>
-                  {advocate.specialties.map((s) => (
-                    <div>{s}</div>
-                  ))}
+                  <ul style={{ listStyle: "unset", padding: "0 30px" }}>
+                    {advocate.specialties.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ul>
                 </td>
                 <td>{advocate.yearsOfExperience}</td>
-                <td>{advocate.phoneNumber}</td>
+                <td>{formatPhone(advocate.phoneNumber)}</td>
               </tr>
             );
           })}
