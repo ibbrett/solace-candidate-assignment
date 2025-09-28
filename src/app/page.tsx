@@ -41,8 +41,11 @@ export default function Home() {
 
   const filteredAdvocates = advocates.filter((advocate) => {
     // find case-insensitive and partial match in strings and string arrays
-    const includes = (item: string, searchString: string) =>
-      new RegExp(searchString, "i").test(item);
+    const includes = (item: string, searchString: string) => {
+      const escapedString = searchString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(escapedString, "i").test(item);
+    };
+
     const includesArray = (items: string[], searchString: string) =>
       items.some((item) =>
         item.toLowerCase().includes(searchString.toLowerCase())
