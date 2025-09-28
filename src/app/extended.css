@@ -18,12 +18,3 @@ td {
   vertical-align: top;
   text-align: left;
 }
-
-h1 {
-  background-color: rgb(38, 91, 78);
-  display: inline-block;
-  color: white;
-  padding: 8px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}

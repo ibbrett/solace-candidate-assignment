@@ -15,6 +15,7 @@ type Advocate = {
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [altView, setAltView] = useState(false);
 
   useEffect(() => {
     console.log("fetching advocates...");
@@ -61,18 +62,8 @@ export default function Home() {
     );
   });
 
-  return (
-    <main style={{ margin: "24px" }}>
-      <h1>Solace Advocates</h1>
-      <div className="my-3">
-        <input
-          placeholder="search for advocate ..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="px-3 py-2 border rounded-lg mr-3"
-        />
-      </div>
-
+  const FilteredTable = () => {
+    return (
       <table>
         <thead>
           <tr>
@@ -107,6 +98,68 @@ export default function Home() {
           })}
         </tbody>
       </table>
+    );
+  };
+
+  const FilteredCards = () => {
+    return (
+      <div className="grid xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 space-x-0 items-stretch">
+        {filteredAdvocates.map((advocate: Advocate, index: number) => {
+          return (
+            <div className=" rounded-lg border border-solid border-gray-400 shadow-lg p-6 mx-auto">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-medium text-gray-900">
+                  {advocate.firstName} {advocate.lastName.slice(0, 1)},{" "}
+                  <span className="text-xs">{advocate.city}</span>
+                </h2>
+                <span className="text-xs rounded-full bg-green-200 py-2 px-4 font-semibold hover:bg-amber-200">
+                  {advocate.degree}
+                </span>
+              </div>
+
+              <p className="mt-2 text-gray-500">
+                <h3 className="font-medium text-gray-900 inline mr-1">
+                  years of experience:
+                </h3>
+                <span>{advocate.yearsOfExperience}</span>
+              </p>
+              <p className="mt-2 text-gray-500">
+                <h3 className="font-medium text-gray-900 inline mr-1">
+                  phone:
+                </h3>
+                <span>{formatPhone(advocate.phoneNumber)}</span>
+              </p>
+              <p className="mt-2 text-gray-500">
+                <h3 className="font-medium text-gray-900">specialties:</h3>
+                <div className="text-xs">{advocate.specialties.join(", ")}</div>
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <main style={{ margin: "24px" }}>
+      <h1 className="bg-green-800 text-white p-2 rounded-lg mb-4 inline-block">
+        Solace Advocates
+      </h1>
+      <div className="my-3">
+        <input
+          placeholder="search for advocate ..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="px-3 py-2 border rounded-lg mr-3"
+        />
+        <a
+          className="align-bottom text-sm underline text-blue-600"
+          onClick={() => setAltView(!altView)}
+        >
+          {altView ? "table" : "card"} view
+        </a>
+      </div>
+      {altView ? <FilteredCards /> : <FilteredTable />}
     </main>
   );
 }
