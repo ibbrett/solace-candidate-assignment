@@ -14,7 +14,6 @@ type Advocate = {
 
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
-  const [filteredAdvocates, setFilteredAdvocates] = useState<Advocate[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -22,37 +21,12 @@ export default function Home() {
     fetch("/api/advocates").then((response) => {
       response.json().then((jsonResponse) => {
         setAdvocates(jsonResponse.data);
-        setFilteredAdvocates(jsonResponse.data);
       });
     });
   }, []);
 
   const handleSearchChange = (e: { target: { value: string } }) => {
     setSearchTerm(e.target.value);
-  };
-
-  const handleSearchReset = () => {
-    setSearchTerm("");
-    setFilteredAdvocates(advocates);
-  };
-
-  const handleSearch = () => {
-    setFilteredAdvocates(
-      advocates.filter((advocate) => {
-        return (
-          advocate.firstName.includes(searchTerm) ||
-          advocate.lastName.includes(searchTerm) ||
-          advocate.city.includes(searchTerm) ||
-          advocate.degree.includes(searchTerm) ||
-          advocate.specialties.includes(searchTerm) ||
-          advocate.yearsOfExperience.toString().includes(searchTerm)
-        );
-      })
-    );
-  };
-
-  const resetSearch = () => {
-    setAdvocates([]);
   };
 
   const formatPhone = (phone: number) => {
@@ -65,37 +39,40 @@ export default function Home() {
     return "";
   };
 
+  const filteredAdvocates = advocates.filter((advocate) => {
+    // find case-insensitive and partial match in strings and string arrays
+    const includes = (item: string, searchString: string) => {
+      const escapedString = searchString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(escapedString, "i").test(item);
+    };
+
+    const includesArray = (items: string[], searchString: string) =>
+      items.some((item) =>
+        item.toLowerCase().includes(searchString.toLowerCase())
+      );
+
+    return (
+      includes(advocate.firstName, searchTerm) ||
+      includes(advocate.lastName, searchTerm) ||
+      includes(advocate.city, searchTerm) ||
+      includes(advocate.degree, searchTerm) ||
+      includesArray(advocate.specialties, searchTerm) ||
+      includes(advocate.yearsOfExperience.toString(), searchTerm)
+    );
+  });
+
   return (
     <main style={{ margin: "24px" }}>
       <h1>Solace Advocates</h1>
-      <div>
-        <p>
-          Searching for: <span>{searchTerm}</span>
-        </p>
-        <p>
-          <input
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="px-3 py-2 border rounded-lg mr-3"
-          />
-
-          <button
-            onClick={handleSearchReset}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded mr-3"
-          >
-            Reset
-          </button>
-
-          <button
-            onClick={handleSearch}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
-          >
-            Search
-          </button>
-        </p>
+      <div className="my-3">
+        <input
+          placeholder="search for advocate ..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="px-3 py-2 border rounded-lg mr-3"
+        />
       </div>
-      <br />
-      <br />
+
       <table>
         <thead>
           <tr>
@@ -117,7 +94,7 @@ export default function Home() {
                 <td>{advocate.city}</td>
                 <td>{advocate.degree}</td>
                 <td>
-                  <ul style={{ listStyle: "unset", padding: "0 30px" }}>
+                  <ul>
                     {advocate.specialties.map((s, i) => (
                       <li key={i}>{s}</li>
                     ))}
