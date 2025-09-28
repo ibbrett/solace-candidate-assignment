@@ -40,13 +40,21 @@ export default function Home() {
   };
 
   const filteredAdvocates = advocates.filter((advocate) => {
+    // find case-insensitive and partial match in strings and string arrays
+    const includes = (item: string, searchString: string) =>
+      new RegExp(searchString, "i").test(item);
+    const includesArray = (items: string[], searchString: string) =>
+      items.some((item) =>
+        item.toLowerCase().includes(searchString.toLowerCase())
+      );
+
     return (
-      advocate.firstName.includes(searchTerm) ||
-      advocate.lastName.includes(searchTerm) ||
-      advocate.city.includes(searchTerm) ||
-      advocate.degree.includes(searchTerm) ||
-      advocate.specialties.includes(searchTerm) ||
-      advocate.yearsOfExperience.toString().includes(searchTerm)
+      includes(advocate.firstName, searchTerm) ||
+      includes(advocate.lastName, searchTerm) ||
+      includes(advocate.city, searchTerm) ||
+      includes(advocate.degree, searchTerm) ||
+      includesArray(advocate.specialties, searchTerm) ||
+      includes(advocate.yearsOfExperience.toString(), searchTerm)
     );
   });
 
