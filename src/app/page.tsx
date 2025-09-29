@@ -106,7 +106,10 @@ export default function Home() {
       <div className="grid xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 space-x-0 items-stretch">
         {filteredAdvocates.map((advocate: Advocate, index: number) => {
           return (
-            <div className=" rounded-lg border border-solid border-gray-400 shadow-lg p-6 mx-auto">
+            <div
+              key={index}
+              className=" rounded-lg border border-solid border-gray-400 shadow-lg p-6 mx-auto"
+            >
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-medium text-gray-900">
                   {advocate.firstName} {advocate.lastName.slice(0, 1)},{" "}
